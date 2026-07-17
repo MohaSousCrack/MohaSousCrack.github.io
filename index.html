@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Ma Tournée</title>
+<title>MohaBanger2ouf</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
   :root{
@@ -21,10 +21,13 @@
 
   header{background:var(--ink);padding:10px 12px 8px;flex:0 0 auto;border-bottom:1px solid var(--line)}
   .brand{display:flex;align-items:center;gap:6px;margin-bottom:8px}
-  .brand h1{margin:0;font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+  .brand h1{margin:0;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
   .cityBtn{display:flex;align-items:center;gap:4px;background:var(--ink-2);border:1px solid var(--line);
     border-radius:999px;color:var(--paper);padding:6px 10px;font-size:12.5px;font-weight:700;cursor:pointer;
     max-width:40vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .iconBtn{flex:0 0 auto;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);
+    background:var(--ink-2);color:var(--paper);font-size:13px;font-weight:800;cursor:pointer;
+    display:flex;align-items:center;justify-content:center}
   .brand .save{margin-left:auto;font-size:10.5px;color:var(--muted);flex:0 0 auto}
   .chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
   .chips::-webkit-scrollbar{display:none}
@@ -125,10 +128,12 @@
 <div id="app">
   <header>
     <div class="brand">
-      <h1>Tournée</h1>
+      <h1>MohaBanger2ouf</h1>
       <button class="cityBtn" id="cityBtn">Ville ▾</button>
-      <button class="cityBtn" id="listBtn">☰ Liste</button>
+      <button class="cityBtn" id="listBtn">☰</button>
       <span class="save" id="saveState"></span>
+      <button class="iconBtn" id="helpBtn" title="Comment ça marche">?</button>
+      <button class="iconBtn" id="aboutBtn" title="À propos">ℹ</button>
     </div>
     <div class="chips" id="chips"></div>
   </header>
@@ -155,8 +160,6 @@
       <div class="note">
         Charge les maisons dans la <b>ville active uniquement</b> — sélectionne d'abord la bonne ville au-dessus.
         Chaque bâtiment d'habitation arrive en « À voir », avec son adresse quand OpenStreetMap la connaît.
-        Si le chargement est bloqué (bac à sable de Claude), ouvre ce fichier directement dans Chrome,
-        ou importe un export GeoJSON d'overpass-turbo.eu ci-dessous.
       </div>
       <button class="bigBtn" id="btnClearAvoir" style="margin-top:8px">🧹 Retirer les « À voir » de la ville</button>
       <div class="note">Utile pour nettoyer un mauvais chargement : seuls les points gris « À voir » sont supprimés, tes points coloriés restent.</div>
@@ -168,7 +171,9 @@
       </div>
       <div class="note">
         Tes données restent <b>sur ton appareil</b> (mémoire du navigateur) — rien n'est envoyé ailleurs.
-        Importer accepte : tes sauvegardes de l'appli (.json) <b>et</b> les exports GeoJSON d'overpass-turbo.eu.
+        L'import <b>fusionne</b> avec l'existant au lieu de tout remplacer : les points de tes collègues
+        s'additionnent aux tiens (statut le plus récent conservé, tes notes jamais écrasées).
+        Importer accepte : les sauvegardes de l'appli (.json) <b>et</b> les exports GeoJSON d'overpass-turbo.eu.
       </div>
       <input type="file" id="fileInput" accept=".json,.geojson,application/json,application/geo+json" style="display:none">
 
@@ -241,6 +246,55 @@
       <button class="bigBtn danger" id="btnLassoDelete" style="margin-top:8px">🗑 Supprimer ces points</button>
       <button class="bigBtn danger" id="btnLassoKeep" style="margin-top:8px">✂ Garder seulement cette zone (supprime le reste de la ville)</button>
       <button class="closeSheet" id="btnCloseLasso">Fermer</button>
+    </div>
+  </div>
+
+  <!-- Aide / première ouverture -->
+  <div class="panel" id="helpPanel">
+    <div class="sheet">
+      <h2>Comment ça marche</h2>
+      <div class="note" style="margin-top:0;font-size:13px;line-height:1.55">
+        <b>1.</b> Menu ville (en haut) → ajoute ta commune → « 🏠 Charger toutes les maisons » : chaque bâtiment arrive en gris « À voir ».<br><br>
+        <b>2.</b> En tournée : touche une maison → choisis sa couleur (Signé, Refus, Absent, Rappel, À repasser), l'opérateur du foyer (l'anneau coloré) et une note. Reste appuyé sur la carte pour ajouter une maison manquante.<br><br>
+        <b>3.</b> « ⇢ Trajet » : ordre de passage optimisé des maisons à faire. « ◌ Lasso » : dessine une zone pour tout changer d'un coup ou calculer le trajet dessus.<br><br>
+        <b>4.</b> « ☰ » : ta liste de repasse (Rappels, À repasser, Absents) avec date et heure.<br><br>
+        <b>5.</b> Tout est enregistré <b>sur ton appareil</b>. « Exporter / Importer » pour sauvegarder ou fusionner avec les collègues.
+      </div>
+      <button class="bigBtn accent" id="btnCloseHelp" style="margin-top:12px">C'est parti ! 🚀</button>
+    </div>
+  </div>
+
+  <!-- À propos -->
+  <div class="panel" id="aboutPanel">
+    <div class="sheet">
+      <h2>À propos</h2>
+      <div class="note" style="margin-top:0;font-size:13.5px;line-height:1.6">
+        <b>MohaBanger2ouf</b> est un petit site mis en place par <b>Moha</b>.<br><br>
+        Pourquoi ? Parce que ça m'énervait de devoir tout noter, de me perdre dans une ville,
+        d'oublier qui était absent et où… Là, tout est sur la carte — et ça a le mérite d'être clair.<br><br>
+        Tes données restent sur ton appareil, rien n'est envoyé sur un serveur.
+      </div>
+      <div class="note" style="font-size:13.5px;line-height:1.6">
+        🍬 Si ce site t'a aidé dans tes tournées, tu peux me laisser un petit pourboire —
+        même 1 €, de quoi m'acheter un paquet de bonbons, ça me rendrait heureux de fou :
+      </div>
+      <a class="bigBtn accent" style="display:block;text-align:center;text-decoration:none;margin-top:10px"
+         href="https://revolut.me/zamdane" target="_blank" rel="noopener">💸 Laisser un pourboire (Revolut)</a>
+      <button class="closeSheet" id="btnCloseAbout">Fermer</button>
+    </div>
+  </div>
+
+  <!-- Rappel de sauvegarde -->
+  <div class="panel" id="backupPanel">
+    <div class="sheet">
+      <h2>⚠️ Sauvegarde tes données</h2>
+      <div class="note" style="margin-top:0;font-size:13.5px;line-height:1.6">
+        <b>Important :</b> tout est stocké <b>uniquement sur cet appareil</b> — rien n'est enregistré dans le cloud.
+        Téléphone perdu, navigateur changé ou données de navigation effacées = tournée perdue avec.<br><br>
+        Exporte ta sauvegarde (.json) et garde-la en lieu sûr (Drive, mail, clé USB…). À refaire régulièrement.
+      </div>
+      <button class="bigBtn accent" id="btnBackupNow" style="margin-top:10px">⬇ Exporter maintenant (.json)</button>
+      <button class="closeSheet" id="btnBackupLater">Me le rappeler la semaine prochaine</button>
     </div>
   </div>
 
@@ -330,6 +384,13 @@
   function coordKey(lat, lng){ return lat.toFixed(5) + "," + lng.toFixed(5); }
   function labelOf(h){
     return h.addr ? h.addr : ("Maison (" + h.lat.toFixed(5) + ", " + h.lng.toFixed(5) + ")");
+  }
+  function fmtTs(ts, withYear){
+    if (!ts) return "";
+    var d = new Date(ts);
+    var dd = ("0"+d.getDate()).slice(-2), mm = ("0"+(d.getMonth()+1)).slice(-2);
+    var hh = ("0"+d.getHours()).slice(-2), mi = ("0"+d.getMinutes()).slice(-2);
+    return dd + "/" + mm + (withYear ? "/" + d.getFullYear() : "") + " " + hh + ":" + mi;
   }
   function defaultHint(){
     return "Touche une maison : couleur, opérateur, note. Reste appuyé sur la carte pour ajouter un point.";
@@ -424,6 +485,7 @@
       b.addEventListener("click", function(){
         lastUndo = {type:"paint", id:h.id, prev:h.status};
         h.status = k;
+        h.statusTs = Date.now();
         refreshMarker(h);
         renderChips(); save(); map.closePopup();
         toast("→ " + STATUSES[k].label, "Annuler", undoLast);
@@ -495,7 +557,7 @@
   function addHouse(lat, lng, status){
     if (!data.activeCityId){ toast("Crée d'abord une ville."); openSheet(); return; }
     var st = status || selected;
-    var h = { id: uid(), cityId: data.activeCityId, lat: lat, lng: lng, status: st, ts: Date.now() };
+    var h = { id: uid(), cityId: data.activeCityId, lat: lat, lng: lng, status: st, ts: Date.now(), statusTs: Date.now() };
     data.houses.push(h);
     if (!filter || filter === h.status) addMarker(h);
     lastUndo = {type:"add", id:h.id};
@@ -506,7 +568,7 @@
     if (!lastUndo) return;
     if (lastUndo.type === "paint"){
       var h = data.houses.find(function(x){ return x.id === lastUndo.id; });
-      if (h){ h.status = lastUndo.prev; }
+      if (h){ h.status = lastUndo.prev; h.statusTs = Date.now(); }
     } else if (lastUndo.type === "add"){
       data.houses = data.houses.filter(function(x){ return x.id !== lastUndo.id; });
     }
@@ -759,7 +821,7 @@
       b.addEventListener("click", function(){
         var set = {}; lassoSel.forEach(function(id){ set[id] = 1; });
         var n = 0;
-        data.houses.forEach(function(h){ if (set[h.id] && h.status !== k){ h.status = k; n++; } });
+        data.houses.forEach(function(h){ if (set[h.id] && h.status !== k){ h.status = k; h.statusTs = Date.now(); n++; } });
         save(); renderAll(); closeLassoPanel();
         toast(n + " maisons passées en « " + STATUSES[k].label + " ».");
       });
@@ -856,7 +918,7 @@
       var t = document.createElement("div"); t.className = "txt";
       var l1 = document.createElement("div"); l1.className = "l1"; l1.textContent = labelOf(h);
       var l2 = document.createElement("div"); l2.className = "l2";
-      l2.textContent = (STATUSES[h.status]||STATUSES.avoir).label + (h.note ? " — " + h.note : "");
+      l2.textContent = (STATUSES[h.status]||STATUSES.avoir).label + (h.statusTs ? " · " + fmtTs(h.statusTs) : "") + (h.note ? " — " + h.note : "");
       t.appendChild(l1); t.appendChild(l2);
       r.appendChild(d); r.appendChild(t);
       if (h.op && OPS[h.op]){
@@ -1048,6 +1110,59 @@
     return out;
   }
 
+  // ---------- Fusion de sauvegardes (import additif) ----------
+  function mergeData(inc){
+    var cityMap = {}, addedC = 0;
+    (inc.cities || []).forEach(function(ic){
+      if (ic.lat == null || ic.lng == null) return;
+      var match = data.cities.find(function(c){
+        return String(c.name||"").trim().toLowerCase() === String(ic.name||"").trim().toLowerCase() ||
+               haversine(c, ic) < 3000;
+      });
+      if (match){ cityMap[ic.id] = match.id; }
+      else {
+        var nc = { id: uid(), name: ic.name || "Ville", lat: ic.lat, lng: ic.lng, zoom: ic.zoom || 15 };
+        data.cities.push(nc); cityMap[ic.id] = nc.id; addedC++;
+      }
+    });
+    var idx = {};
+    data.houses.forEach(function(h){
+      if (h.osm) idx[h.cityId + "|" + h.osm] = h;
+      idx[h.cityId + "|" + coordKey(h.lat, h.lng)] = h;
+    });
+    var addedH = 0, updated = 0;
+    (inc.houses || []).forEach(function(ih){
+      if (ih.lat == null || ih.lng == null) return;
+      var cid = cityMap[ih.cityId];
+      if (!cid) return;
+      var ex = (ih.osm && idx[cid + "|" + ih.osm]) || idx[cid + "|" + coordKey(ih.lat, ih.lng)];
+      if (!ex){
+        var nh = { id: uid(), cityId: cid, lat: ih.lat, lng: ih.lng,
+                   status: ih.status || "avoir", op: ih.op || null, note: ih.note || null,
+                   osm: ih.osm || null, addr: ih.addr || null,
+                   ts: ih.ts || Date.now(), statusTs: ih.statusTs || null };
+        data.houses.push(nh);
+        if (nh.osm) idx[cid + "|" + nh.osm] = nh;
+        idx[cid + "|" + coordKey(nh.lat, nh.lng)] = nh;
+        addedH++;
+      } else {
+        var exT = ex.statusTs || ex.ts || 0, inT = ih.statusTs || ih.ts || 0;
+        var exInfo = ex.status && ex.status !== "avoir";
+        var inInfo = ih.status && ih.status !== "avoir";
+        var changed = false;
+        if (inInfo && (!exInfo || inT > exT)){
+          if (ex.status !== ih.status){ ex.status = ih.status; changed = true; }
+          ex.statusTs = ih.statusTs || ih.ts || ex.statusTs;
+        }
+        if (!ex.op && ih.op){ ex.op = ih.op; changed = true; }
+        if (!ex.note && ih.note){ ex.note = ih.note; changed = true; }
+        if (!ex.addr && ih.addr){ ex.addr = ih.addr; }
+        if (changed) updated++;
+      }
+    });
+    return { addedC: addedC, addedH: addedH, updated: updated };
+  }
+
   // ---------- Exports ----------
   function downloadFile(name, content, mime){
     try{
@@ -1074,17 +1189,21 @@
   document.getElementById("btnCloseExportChoice").addEventListener("click", function(){
     document.getElementById("exportChoicePanel").style.display = "none";
   });
+  function doExportJson(){
+    if (downloadFile("mohabanger2ouf-" + dateStamp() + ".json", JSON.stringify(data), "application/json"))
+      toast("Sauvegarde exportée — garde-la précieusement.");
+    try{ stSet("mb2o-backup-next", String(Date.now() + 7*24*3600*1000)); }catch(e){}
+  }
   document.getElementById("btnExportJson").addEventListener("click", function(){
     document.getElementById("exportChoicePanel").style.display = "none";
-    if (downloadFile("tournee-" + dateStamp() + ".json", JSON.stringify(data), "application/json"))
-      toast("Sauvegarde exportée — garde-la précieusement.");
+    doExportJson();
   });
   document.getElementById("btnExportTxt").addEventListener("click", function(){
     document.getElementById("exportChoicePanel").style.display = "none";
     var c = activeCity();
     if (!c){ toast("Aucune ville active."); return; }
     var d = new Date();
-    var lines = ["MA TOURNÉE — " + c.name, "Export du " + d.toLocaleDateString("fr-FR"), ""];
+    var lines = ["MOHABANGER2OUF — " + c.name, "Export du " + d.toLocaleDateString("fr-FR"), ""];
     var hs = cityHouses();
     ORDER.forEach(function(k){
       if (k === "avoir") return;
@@ -1094,6 +1213,7 @@
       pts.forEach(function(h){
         var l = "• " + labelOf(h);
         if (h.op && OPS[h.op]) l += " — " + OPS[h.op].label;
+        if (h.statusTs) l += " — " + fmtTs(h.statusTs, true);
         if (h.note) l += " — « " + h.note + " »";
         lines.push(l);
       });
@@ -1103,12 +1223,12 @@
     if (noted.length){
       lines.push("== À VOIR avec note (" + noted.length + ") ==");
       noted.forEach(function(h){
-        lines.push("• " + labelOf(h) + (h.op && OPS[h.op] ? " — " + OPS[h.op].label : "") + " — « " + h.note + " »");
+        lines.push("• " + labelOf(h) + (h.op && OPS[h.op] ? " — " + OPS[h.op].label : "") + (h.statusTs ? " — " + fmtTs(h.statusTs, true) : "") + " — « " + h.note + " »");
       });
       lines.push("");
     }
     if (lines.length <= 3){ toast("Rien à exporter pour l'instant (aucun point colorié ou annoté)."); return; }
-    if (downloadFile("tournee-notes-" + dateStamp() + ".txt", lines.join("\n"), "text/plain;charset=utf-8"))
+    if (downloadFile("mohabanger2ouf-notes-" + dateStamp() + ".txt", lines.join("\n"), "text/plain;charset=utf-8"))
       toast("Notes exportées en .txt.");
   });
   document.getElementById("btnSelectAll").addEventListener("click", function(){
@@ -1138,12 +1258,12 @@
           return;
         }
         if (!parsed || !Array.isArray(parsed.cities) || !Array.isArray(parsed.houses)) throw new Error("format");
-        data = parsed;
+        var res = mergeData(parsed);
         if (!activeCity() && data.cities.length) data.activeCityId = data.cities[0].id;
         save(); renderAll(); closeSheet();
         var c2 = activeCity();
         if (c2) map.setView([c2.lat, c2.lng], c2.zoom || 15);
-        toast("Sauvegarde importée : " + data.houses.length + " points, " + data.cities.length + " ville(s).");
+        toast("Fusion : +" + res.addedH + " points, " + res.updated + " mis à jour, +" + res.addedC + " ville(s).");
       }catch(e){ toast("Fichier illisible — sauvegarde de l'appli (.json) ou GeoJSON attendu."); }
     };
     reader.readAsText(f);
@@ -1265,12 +1385,48 @@
     toastTimer = setTimeout(function(){ t.style.display = "none"; }, 5500);
   }
 
+  // ---------- Aide & À propos ----------
+  function openHelp(){ document.getElementById("helpPanel").style.display = "flex"; }
+  document.getElementById("helpBtn").addEventListener("click", openHelp);
+  document.getElementById("btnCloseHelp").addEventListener("click", function(){
+    document.getElementById("helpPanel").style.display = "none";
+  });
+  document.getElementById("aboutBtn").addEventListener("click", function(){
+    document.getElementById("aboutPanel").style.display = "flex";
+  });
+  document.getElementById("btnCloseAbout").addEventListener("click", function(){
+    document.getElementById("aboutPanel").style.display = "none";
+  });
+
+  // ---------- Rappel de sauvegarde ----------
+  function snoozeBackup(){
+    try{ stSet("mb2o-backup-next", String(Date.now() + 7*24*3600*1000)); }catch(e){}
+    document.getElementById("backupPanel").style.display = "none";
+  }
+  document.getElementById("btnBackupLater").addEventListener("click", snoozeBackup);
+  document.getElementById("btnBackupNow").addEventListener("click", function(){
+    doExportJson(); // repousse déjà le rappel d'une semaine
+    document.getElementById("backupPanel").style.display = "none";
+  });
+
   // ---------- Démarrage ----------
   renderStamps(); styleStampHere(); setHint();
-  load().then(function(){
+  load().then(async function(){
     var c = activeCity();
     if (c) map.setView([c.lat, c.lng], c.zoom || 15);
     renderAll();
+    var seen = null, visits = 0, next = 0;
+    try{ seen = await stGet("mb2o-help"); }catch(e){}
+    try{ visits = parseInt(await stGet("mb2o-visits"), 10) || 0; }catch(e){}
+    visits++;
+    try{ stSet("mb2o-visits", String(visits)); }catch(e){}
+    try{ next = parseInt(await stGet("mb2o-backup-next"), 10) || 0; }catch(e){}
+    if (!seen){
+      openHelp();
+      try{ stSet("mb2o-help", "1"); }catch(e){}
+    } else if (visits >= 3 && Date.now() >= next && data.houses.length){
+      document.getElementById("backupPanel").style.display = "flex";
+    }
   });
 })();
 </script>
